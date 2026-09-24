@@ -2,6 +2,7 @@ package indent.rainbow.highlightingPass
 
 import com.intellij.openapi.editor.Document
 import com.intellij.util.text.CharArrayUtil
+import indent.rainbow.settings.IrHighlightType
 
 /**
  * Consider code:
@@ -41,14 +42,16 @@ class IndentDescriptor(
     }
 }
 
-fun createDescriptors(document: Document, indents: LineIndents, onlyErrors: Boolean): List<IndentDescriptor> {
+fun createDescriptors(document: Document, indents: LineIndents, highlightType: IrHighlightType? = IrHighlightType.ALL): List<IndentDescriptor> {
     val (levels, indentSize) = indents
     var previousLevel = 0
     val descriptors = mutableListOf<IndentDescriptor>()
     for (line in levels.indices) {
         val currentLevel = levels[line]
         if (currentLevel == -1) {
-            descriptors += createErrorDescriptor(document, line)
+            if (highlightType != IrHighlightType.CORRECT_ONLY) {
+                descriptors += createErrorDescriptor(document, line)
+            }
             previousLevel = 0
             continue
         }
@@ -59,7 +62,7 @@ fun createDescriptors(document: Document, indents: LineIndents, onlyErrors: Bool
                 ++lineEnd
             }
             --lineEnd  // inclusive
-            if (!onlyErrors) {
+            if (highlightType != IrHighlightType.INCORRECT_ONLY) {
                 descriptors += createDescriptor(document, line, lineEnd, level, indentSize)
             }
         }

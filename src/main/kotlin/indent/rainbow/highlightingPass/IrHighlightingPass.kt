@@ -15,6 +15,7 @@ import com.intellij.psi.PsiFile
 import indent.rainbow.annotators.IrAnnotatorType
 import indent.rainbow.annotators.isAnnotatorEnabled
 import indent.rainbow.settings.IrConfig
+import indent.rainbow.settings.IrHighlightType
 
 class IrHighlightingPassFactory : TextEditorHighlightingPassFactoryRegistrar, TextEditorHighlightingPassFactory, DumbAware {
     override fun registerHighlightingPassFactory(registrar: TextEditorHighlightingPassRegistrar, project: Project) {
@@ -44,7 +45,7 @@ class IrHighlightingPass(
 
         if (!config.isAnnotatorEnabled(file, IrAnnotatorType.SIMPLE_HIGHLIGHTING_PASS)) return
         val indents = LineIndentsCalculator(file, document).compute()
-        val descriptors = createDescriptors(document, indents, config.highlightOnlyIncorrectIndent)
+        val descriptors = createDescriptors(document, indents, config.highlightType)
         editor.putUserData(IR_DESCRIPTORS, descriptors)
     }
 

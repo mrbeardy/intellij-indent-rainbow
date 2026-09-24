@@ -1,11 +1,13 @@
 package indent.rainbow.settings
 
-import com.intellij.openapi.application.ApplicationBundle
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
+import com.intellij.openapi.application.ApplicationBundle
+import com.intellij.ui.SimpleListCellRenderer
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.RowLayout.PARENT_GRID
+
 import indent.rainbow.IrColors
 import kotlin.reflect.KMutableProperty0
 
@@ -19,8 +21,8 @@ class IrConfigurableAdvanced : BoundConfigurable("Advanced Settings") {
             checkBox("Enable in read only files").bindSelected(config::isEnabledForReadOnlyFiles)
         }
         row {
-            checkBox("Highlight only lines with incorrect indentation").bindSelected(config::highlightOnlyIncorrectIndent)
-        }
+            createHighlightTypeComboBox()
+        }.layout(PARENT_GRID)
         row {
             checkBox("Highlight empty lines").bindSelected(config::highlightEmptyLines)
         }
@@ -47,6 +49,15 @@ class IrConfigurableAdvanced : BoundConfigurable("Advanced Settings") {
                 checkBox("Apply to both left and right side").bindSelected(config::applyRadiusToBothSides)
             }
         }
+    }
+
+    private fun Row.createHighlightTypeComboBox() {
+        label("Highlighting type:")
+        comboBox(IrHighlightType.values().toList())
+            .applyToComponent {
+                renderer = SimpleListCellRenderer.create<IrHighlightType>("") { it.displayName }
+            }
+            .bindItem(config::highlightType)
     }
 
     private fun Row.createDisableOnBigFilesCheckBox() {

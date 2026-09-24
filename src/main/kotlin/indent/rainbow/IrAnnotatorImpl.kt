@@ -11,6 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import indent.rainbow.annotators.isCommentOrInjectedHost
 import indent.rainbow.annotators.isWhiteSpace
 import indent.rainbow.settings.IrConfig
+import indent.rainbow.settings.IrHighlightType
 import indent.rainbow.settings.cachedData
 import kotlin.math.min
 
@@ -98,6 +99,9 @@ class IrAnnotatorImpl private constructor(
 
         val prefixActual = lineText.takeWhile { it == ' ' || it == '\t' }
 
+        val highlightOnlyCorrectIndent = config.highlightType == IrHighlightType.CORRECT_ONLY
+        val highlightOnlyIncorrectIndent = config.highlightType == IrHighlightType.INCORRECT_ONLY
+
         val disableErrorHighlighting = config.cachedData.disableErrorHighlightingLanguageFilter(file.language)
                 || !useFormatterIndentHelper
                 // todo this is actually a workaround,
@@ -105,7 +109,8 @@ class IrAnnotatorImpl private constructor(
                 || useTabs && indentSpaces % tabSize != 0
                 || forceDisableErrorHighlighting
         val isCorrectIndent = prefixActual == prefixExpected
-        if (isCorrectIndent && config.highlightOnlyIncorrectIndent) return
+        if (isCorrectIndent && highlightOnlyIncorrectIndent) return
+        if (!isCorrectIndent && highlightOnlyCorrectIndent) return
         if (isCorrectIndent || disableErrorHighlighting) {
             if (disableErrorHighlighting) {
                 var indentSpacesActual = prefixActual.replace("\t", " ".repeat(tabSize)).length

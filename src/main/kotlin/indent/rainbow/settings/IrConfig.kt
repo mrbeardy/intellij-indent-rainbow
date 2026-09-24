@@ -8,12 +8,12 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 data class IrConfig(
     var enabled: Boolean = true,
     var disableErrorHighlightingLanguageMasks: String = "Markdown; Haskell",
-    var highlightOnlyIncorrectIndent: Boolean = false,
     var isEnabledForReadOnlyFiles: Boolean = false,
     var highlightEmptyLines: Boolean = true,
     var opacityMultiplier: Float = 0F,  // [-1, +1]
     var fileMasks: String = "*",
 
+    var highlightType: IrHighlightType? = DEFAULT_HIGHLIGHT_TYPE,
     var paletteType: IrColorsPaletteType = DEFAULT_PALETTE_TYPE,
     var customPalette: String = DEFAULT_CUSTOM_COLORS,
     // BACKCOMPAT: Remove it
@@ -43,9 +43,15 @@ data class IrConfig(
         val isInitialized: Boolean get() = serviceOrNull<IrConfig>() != null
 
         val DEFAULT_PALETTE_TYPE: IrColorsPaletteType = IrColorsPaletteType.PASTEL
+        val DEFAULT_HIGHLIGHT_TYPE: IrHighlightType = IrHighlightType.ALL
         const val DEFAULT_CUSTOM_COLORS = "4D802020, ..."
         const val DEFAULT_IGNORE_LINES_STARTING_WITH: String = "//|\\*"
     }
 }
 
 enum class IrColorsPaletteType { DEFAULT, PASTEL, CUSTOM }
+enum class IrHighlightType(val displayName: String) {
+    ALL("Highlight all indentation"),
+    CORRECT_ONLY("Highlight only correct indentation"),
+    INCORRECT_ONLY("Highlight only incorrect indentation")
+}
